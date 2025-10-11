@@ -1,0 +1,25 @@
+'use strict';
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+// Note: the TS source contains the renderer. For simplicity, in production use ts-node or compile TS to JS.
+const procedural = require('../src/proceduralEngine');
+const app = express();
+const PORT = process.env.PORT || 10000;
+app.use(helmet());
+app.use(cors());
+app.use(bodyParser.json({ limit: '5mb' }));
+app.use(rateLimit({ windowMs: 60*1000, max: Number(process.env.RATE_LIMIT || 120) }));
+app.get('/api/presets', (req,res)=>{ res.json({ ok:true, presets: ['zamba','african voices','brazil drums','mexican trumpet','house','lofi','ambient'] }); });
+app.post('/api/generate', async (req,res)=>{
+  try{
+    const { prompt, bpm=100, key='C', mode='minor' } = req.body || {};
+    if(!prompt) return res.status(400).json({ error:'prompt required' });
+    const track = procedural.generateTrackFromPrompt({ channelId:'ch1', prompt, bpm, key, mode });
+    const wavBase64 = await procedural.renderTrackToWavBase64(track, { sampleRate:44100 });
+    res.json({ status:'ok', prompt, bpm, key, track, audioStream: 'data:audio/wav;base64,' + wavBase64 });
+  }catch(e){ console.error(e); res.status(500).json({ error:'server error', detail: e.message }); }
+});
+app.listen(PORT, ()=> console.log('Soundeus backend (Deus) running on', PORT));

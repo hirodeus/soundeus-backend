@@ -1,9 +1,10 @@
-# Soundeus
+# Soundeus Backend (Deus edition)
 
-**Soundeus** es una aplicación web que genera música en tiempo real mediante prompts, ideal para DJs y creadores musicales.
+Backend procedural de audio para Soundeus — diseñado por Deus (yosoydeus.com).
 
-## Instalación
-
-1. Clona este repositorio:
-   ```bash
-   git clone https://github.com/hirodeus/soundeus.git
+## Quick deploy (Render)
+1. Push this repo to GitHub.
+2. Create a Web Service on Render, connect the repo.
+3. Build command: `npm install && npm run build`
+4. Start command: `npm start`
+5. Add env: PORT, JWT_SECRET
